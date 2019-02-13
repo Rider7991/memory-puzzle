@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Card from './card';
 import './style.css';
+import {randomId} from './utils';
+
+const numberOfCards = 18;
 
 class Board extends React.Component {
 	constructor(props) {
@@ -13,27 +17,26 @@ class Board extends React.Component {
 		this.clickedCardId = [2];
 		this.checkIfFound = this.checkIfFound.bind(this);
 
-		var numberOfCards = 18;
-		var cards = [];
-		var pairId = [numberOfCards];
+		let cards = [];
+		let pairId = [numberOfCards];
 
-		for ( var i = 0; i < numberOfCards/2; i++) {
-			let id = this.randomId(0, numberOfCards/2);
+		for ( let i = 0; i < numberOfCards/2; i++) {
+			let id = randomId(0, numberOfCards/2);
 
 			while (pairId.indexOf(id) !== -1) {
-				id = this.randomId(0, numberOfCards/2);
+				id = randomId(0, numberOfCards/2);
 			}
 
 			pairId[i] = id;
 		}
 
-		var duplicatedPairId = pairId.splice(numberOfCards/2, numberOfCards);
+		let duplicatedPairId = pairId.splice(numberOfCards/2, numberOfCards);
 
-		for (var k = 0; k < numberOfCards/2; k++) {
-			let id = this.randomId(0, (numberOfCards/2)-1);
+		for (let k = 0; k < numberOfCards/2; k++) {
+			let id = randomId(0, (numberOfCards/2)-1);
 
 			while (duplicatedPairId.indexOf(pairId[id]) !== -1) {
-				id = this.randomId(0, (numberOfCards/2)-1);
+				id = randomId(0, (numberOfCards/2)-1);
 			}
 
 			duplicatedPairId[k] = pairId[id];
@@ -41,7 +44,7 @@ class Board extends React.Component {
 
 		pairId = pairId.concat(duplicatedPairId);
 
-		for (var j = 0; j < numberOfCards; j++) {
+		for (let j = 0; j < numberOfCards; j++) {
 			this.cardsRefs.push(React.createRef());
 			cards.push(this.renderCard("card-"+j, j, j, pairId[j]));
 		}
@@ -56,27 +59,27 @@ class Board extends React.Component {
 	saveId(pairid, id) {
 		switch(this.state.exposedCards) {
 			case 0:
-			this.clickedCardPairId[0] = pairid;
-			this.clickedCardId[0] = id;
-			break;
+				this.clickedCardPairId[0] = pairid;
+				this.clickedCardId[0] = id;
+				break;
 
 			case 1:
-			this.clickedCardPairId[1] = pairid;
-			this.clickedCardId[1] = id;
-			break;
+				this.clickedCardPairId[1] = pairid;
+				this.clickedCardId[1] = id;
+				break;
 
 			default:
-			this.clickedCardPairId[0] = null;
-			this.clickedCardPairId[1] = null;
-			this.clickedCardId[0] = null;
-			this.clickedCardId[1] = null;
-			break;
+				this.clickedCardPairId[0] = null;
+				this.clickedCardPairId[1] = null;
+				this.clickedCardId[0] = null;
+				this.clickedCardId[1] = null;
+				break;
 		}
 	}
 
 	checkIfFound() {
 		if (this.clickedCardPairId[0] === this.clickedCardPairId[1] && this.clickedCardPairId[1] !== null && this.clickedCardPairId[0] !== null && this.clickedCardId[0] !== this.clickedCardId[1]) {
-			let cards = [18];
+			let cards = [numberOfCards];
 			let j = 0;
 			while(j < this.state.cards.length) {
 				cards[j] = this.state.cards[j];
@@ -94,7 +97,7 @@ class Board extends React.Component {
 				i++;
 			}
 
-			if (counter === 18) {
+			if (counter === numberOfCards) {
 				alert("You have found all pairs! Nice job :-)");
 				document.location.href = "https://mateusz-styrna.pl/";
 			}
@@ -124,10 +127,6 @@ class Board extends React.Component {
 		}
 	}
 
-	randomId(min, max) {
-    	return Math.round(Math.random() * (max - min) + min);
-	}
-
 	exposeCard() {
 		this.setState({
 				exposedCards: this.state.exposedCards + 1,
@@ -138,7 +137,7 @@ class Board extends React.Component {
 							exposedCards: 0,
 						}, 
 						() => {
-							for(var i = 0; i < this.cardsRefs.length; i++) {
+							for(let i = 0; i < this.cardsRefs.length; i++) {
 								if (this.cardsRefs[i].current !== null) {
 									this.cardsRefs[i].current.hide();
 								}
@@ -160,59 +159,6 @@ class Board extends React.Component {
 				{this.state.cards}
 			</div>
 		);
-	}
-}
-
-class Card extends React.Component {
-	constructor() {
-		super();
-
-		let style = {
-			backgroundImage: 'url()',
-		};
-
-		this.state = {
-			exposed: false,
-			src: style
-		}
-	}
-
-	changeState() {
-		this.setState({
-			exposed: !this.state.exposed,
-		});
-	}
-
-	isReveal() {
-		if (this.state.exposed === true) {
-			return ' exposed';
-		}
-		else {
-			return ' unexposed';
-		}
-	}
-
-	hide() {
-		this.setState({
-			exposed: false,
-		});
-	}
-
-	render() {
-		return(
-			<div className={'card ' + this.isReveal()} style={this.state.src} id={this.props.id} onClick={() => {setTimeout(this.props.checkIfFound, 500); this.props.saveId(this.props.pairId, this.props.id); this.changeState(); this.props.exposeCard();}}>
-			</div>
-		);
-	}
-
-	componentDidMount() {
-		let style = {
-			backgroundImage: 'url(images/'+this.props.pairId+'.png)',
-		};
-
-		this.setState({
-			src: style
-		});
 	}
 }
 
